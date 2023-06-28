@@ -1,4 +1,3 @@
-from sys import exit
 import json
 from os import system
 
