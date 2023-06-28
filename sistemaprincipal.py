@@ -40,14 +40,32 @@ def isnumber(num, tipo):
     except ValueError:
         return True, True
 
+def func_verifica_item(nome, tipo):
+    for identificador, produto in estoque.items():
+        if produto['nome'].lower() == nome.lower() and produto['tipo'].lower() == tipo.lower():
+            return True  
+    return False  
+
+def estoque_vazio():
+    if not estoque:
+        print("Nenhum produto cadastrado.")
+        return True
+    return False     
+       
 def cadastrar_produto():
     system("cls")
     titulo("CADASTRAR PRODUTO")
     nome = input("Nome do produto: ").capitalize()
     tipo = input("Tipo do produto: ")
+    
+    if func_verifica_item(nome, tipo):
+        system("cls")
+        print("Produto já cadastrado")
+        return
+    
     valor = func_verifica_numero(input("Preço de venda: ").replace(",", "."), float)
     estoque_inicial = func_verifica_numero(input("Quantos itens em estoque?: "), int)
-
+    
     if nome and tipo and valor and estoque_inicial:
         identificador = len(estoque) + 1
         estoque[identificador] = {
@@ -64,7 +82,11 @@ def realizar_venda():
     system("cls")
     titulo("REALIZAR VENDA")
     nome = input("Digite o nome do produto a ser vendido: ")
-
+    
+    system("cls")
+    if estoque_vazio():
+        return
+    
     for identificador, produto in estoque.items():
         if produto['nome'].lower() == nome.lower():
             quantidade = func_verifica_numero(input(f"Quantidade desejada ({produto['quantidade']} em estoque): "), int)
@@ -90,6 +112,10 @@ def alterar_produto():
     system("cls")
     titulo("ALTERAR PRODUTO")
     nome = input("Digite o nome do produto a ser alterado: ")
+
+    system("cls")
+    if estoque_vazio():
+        return
 
     for identificador, produto in estoque.items():
         if produto['nome'].lower() == nome.lower():
@@ -123,16 +149,20 @@ def relatorio_produtos():
 
     match opcao:
         case 1:
-            print("{:<10} {:<20} {:<15} {:<10} {:<10}".format("Identificador", "Nome", "Tipo", "Preço", "Quantidade"))
+            system("cls")
+            if estoque_vazio():
+                return
+            print("{:<20} {:<18} {:<15} {:<15} {:<10}".format("Identificador", "Nome", "Tipo", "Preço", "Quantidade").upper())
             for identificador, produto in estoque.items():
-                print("{:<14} {:<20} {:<15} R${:<9.2f} {:<10}".format(
+                print("{:<20} {:<18} {:<15} R${:<15.2f} {:<10}".format(
                     identificador, produto['nome'], produto['tipo'], produto['valor'], produto['quantidade']))
         case 2:
-            print("{:<10} {:<20} {:<10} {:<15}".format("Identificador", "Nome", "Quantidade", "Valor Total"))
+            if not vendas:
+                print("Nenhuma venda realizada.")
+                return
+            print("{:<20} {:<18} {:<15} {:<15}".format("Identificador", "Nome", "Quantidade", "Valor Total").upper())
             for venda in vendas:
-                print("{:<14} {:<20} {:<10} R${:<9.2f}".format(
-                    venda['identificador_produto'], venda['nome_produto'],
-                    venda['quantidade_vendida'], venda['valor_total']))
+                print("{:<20} {:<18} {:<15} R${:<15.2f}".format(venda['identificador_produto'], venda['nome_produto'],venda['quantidade_vendida'], venda['valor_total']))
         case _:
             erro("Opção")
 
